@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Static Code Analyzer</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CodeMirror for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Smart Code Analyzer</h1>
+            <p>Write your C-like code below and let our AI-powered engine analyze it.</p>
+        </header>
+
+        <!-- Glass Metrics Bar -->
+        <div class="metrics-bar">
+            <div class="glass-metric">
+                <span class="m-val" id="metric-tokens">-</span>
+                <span class="m-label">Tokens</span>
+            </div>
+            <div class="glass-metric">
+                <span class="m-val" id="metric-issues">-</span>
+                <span class="m-label">Issues</span>
+            </div>
+            <div class="glass-metric">
+                <span class="m-val" id="metric-funcs">-</span>
+                <span class="m-label">Functions</span>
+            </div>
+            <div class="glass-metric">
+                <span class="m-val" id="metric-vars">-</span>
+                <span class="m-label">Variables</span>
+            </div>
+        </div>
+
+        <main>
+            <section class="editor-section">
+                <!-- Our textarea to be replaced by CodeMirror -->
+                <textarea id="code-editor">int main() {
+    int x = 10;
+    int y = x + 5;
+    return y;
+    int z = 0; // Unused
+}
+</textarea>
+                <button id="analyze-btn">Analyze Code <span>✨</span></button>
+            </section>
+
+            <section class="results-section">
+                <!-- Glassy Tabs -->
+                <div class="glass-tabs">
+                    <button class="g-tab active" data-tab="tab-semantic">AI Analysis</button>
+                    <button class="g-tab" data-tab="tab-console">Terminal</button>
+                    <button class="g-tab" data-tab="tab-tokens">Tokens</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- SEMANTIC AI TAB -->
+                    <div id="tab-semantic" class="g-pane active">
+                        <div class="glass-panel summary-panel" id="summary-panel" style="display: none;">
+                            <h2>AI Summary</h2>
+                            <p id="ai-summary-text"></p>
+                            <div class="score-container">
+                                <span>Quality Score:</span>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="score-bar"></div>
+                                </div>
+                                <span id="score-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="issues-list" id="issues-list">
+                            <!-- Cards will be dynamically inserted here -->
+                            <div class="placeholder-text">Analysis results will appear here.</div>
+                        </div>
+                    </div>
+
+                    <!-- TERMINAL TAB -->
+                    <div id="tab-console" class="g-pane">
+                        <div class="terminal-panel" id="terminal-panel">
+                            <div class="terminal-header">
+                                <span>>_ Console Output</span>
+                            </div>
+                            <div class="terminal-body" id="terminal-output">
+                                <div class="placeholder-text" style="color: rgba(255,255,255,0.4)">Run valid code to view output...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOKENS TAB -->
+                    <div id="tab-tokens" class="g-pane">
+                        <div class="glass-panel" style="padding: 0; overflow: hidden;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Line</th>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tokens-table-body">
+                                    <tr><td colspan="3" class="placeholder-text">No tokens parsed.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
