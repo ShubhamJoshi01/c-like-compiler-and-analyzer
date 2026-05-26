@@ -163,12 +163,36 @@ public:
         else if (auto id = dynamic_cast<IdentifierNode*>(node)) {
             return getVar(id->name);
         }
+        else if (auto un = dynamic_cast<UnaryOpNode*>(node)) {
+            Value val = evalExpr(un->expr.get());
+            if (un->op == "!") {
+                int v = val.type == "int" ? val.int_val : (int)val.char_val;
+                return {"int", v == 0 ? 1 : 0, 0};
+            }
+        }
         else if (auto fc = dynamic_cast<FunctionCallNode*>(node)) {
             std::vector<Value> args;
             for (auto& a : fc->args) args.push_back(evalExpr(a.get()));
             return callFunction(fc->name, args);
         }
         else if (auto bin = dynamic_cast<BinaryOpNode*>(node)) {
+            if (bin->op == "&&") {
+                Value l = evalExpr(bin->left.get());
+                int lv = l.type == "int" ? l.int_val : (int)l.char_val;
+                if (lv == 0) return {"int", 0, 0};
+                Value r = evalExpr(bin->right.get());
+                int rv = r.type == "int" ? r.int_val : (int)r.char_val;
+                return {"int", rv != 0 ? 1 : 0, 0};
+            }
+            if (bin->op == "||") {
+                Value l = evalExpr(bin->left.get());
+                int lv = l.type == "int" ? l.int_val : (int)l.char_val;
+                if (lv != 0) return {"int", 1, 0};
+                Value r = evalExpr(bin->right.get());
+                int rv = r.type == "int" ? r.int_val : (int)r.char_val;
+                return {"int", rv != 0 ? 1 : 0, 0};
+            }
+            
             Value l = evalExpr(bin->left.get());
             Value r = evalExpr(bin->right.get());
             

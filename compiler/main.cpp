@@ -56,6 +56,7 @@ int main() {
         std::cout << "  \"total_funcs\": " << analyzer.totalFuncs << "," << std::endl;
         std::cout << "  \"total_vars\": " << analyzer.totalVars << "," << std::endl;
         std::cout << "  \"total_tokens\": " << tokens.size() << "," << std::endl;
+        std::cout << "  \"ast\": " << ast->toJson() << "," << std::endl;
         
         std::cout << "  \"tokens\": [" << std::endl;
         for (size_t i = 0; i < tokens.size(); ++i) {
@@ -68,7 +69,8 @@ int main() {
                 case TokenType::IntegerLit: case TokenType::CharLit: t_type = "NUMBER"; break;
                 case TokenType::Plus: case TokenType::Minus: case TokenType::Star: case TokenType::Slash: 
                 case TokenType::Assign: case TokenType::Eq: case TokenType::Neq: case TokenType::Lt: 
-                case TokenType::Gt: case TokenType::Lte: case TokenType::Gte: t_type = "OPERATOR"; break;
+                case TokenType::Gt: case TokenType::Lte: case TokenType::Gte:
+                case TokenType::AmpAmp: case TokenType::PipePipe: case TokenType::Bang: t_type = "OPERATOR"; break;
                 case TokenType::LParen: case TokenType::RParen: case TokenType::LBrace: case TokenType::RBrace: 
                 case TokenType::Semi: case TokenType::Comma: t_type = "SYMBOL"; break;
                 case TokenType::Eof: t_type = "EOF"; break;

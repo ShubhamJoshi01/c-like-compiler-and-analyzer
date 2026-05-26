@@ -149,13 +149,28 @@ public:
         else if (auto pn = dynamic_cast<PrintNode*>(node)) {
             visit(pn->expr.get());
         }
+        else if (auto un = dynamic_cast<UnaryOpNode*>(node)) {
+            visit(un->expr.get());
+            std::string t = getType(un->expr.get());
+            if (un->op == "!") {
+                if (t != "" && t != "int" && t != "char") {
+                    error(un->line, "Type error: logical negation operator '!' expects numeric or char operand");
+                }
+            }
+        }
         else if (auto bin = dynamic_cast<BinaryOpNode*>(node)) {
             visit(bin->left.get());
             visit(bin->right.get());
             std::string lt = getType(bin->left.get());
             std::string rt = getType(bin->right.get());
-            if (lt != rt && lt != "" && rt != "") {
-                error(bin->line, "Type mismatch in binary operation between " + lt + " and " + rt);
+            if (bin->op == "&&" || bin->op == "||") {
+                if ((lt != "" && lt != "int" && lt != "char") || (rt != "" && rt != "int" && rt != "char")) {
+                    error(bin->line, "Type error: logical operator '" + bin->op + "' expects int or char operands");
+                }
+            } else {
+                if (lt != rt && lt != "" && rt != "") {
+                    error(bin->line, "Type mismatch in binary operation between " + lt + " and " + rt);
+                }
             }
         }
         else if (auto fc = dynamic_cast<FunctionCallNode*>(node)) {
@@ -200,7 +215,8 @@ public:
         if (auto fc = dynamic_cast<FunctionCallNode*>(node)) {
             if (functions.count(fc->name)) return functions[fc->name].returnType;
         }
-        // In this simple analyzer, arithmetic expressions result in int, except char stringing operations aren't allowed
+        if (dynamic_cast<UnaryOpNode*>(node)) return "int";
+        // In this simple analyzer, arithmetic and logical expressions result in int
         if (dynamic_cast<BinaryOpNode*>(node)) return "int";
         return "";
     }

@@ -212,7 +212,29 @@ public:
     }
 
     std::unique_ptr<ASTNode> parseExpression() {
-        return parseComparison();
+        return parseLogicalOr();
+    }
+
+    std::unique_ptr<ASTNode> parseLogicalOr() {
+        auto left = parseLogicalAnd();
+        while (current().type == TokenType::PipePipe) {
+            Token op = current();
+            advance();
+            auto right = parseLogicalAnd();
+            left = std::make_unique<BinaryOpNode>(op.value, std::move(left), std::move(right), op.line);
+        }
+        return left;
+    }
+
+    std::unique_ptr<ASTNode> parseLogicalAnd() {
+        auto left = parseComparison();
+        while (current().type == TokenType::AmpAmp) {
+            Token op = current();
+            advance();
+            auto right = parseComparison();
+            left = std::make_unique<BinaryOpNode>(op.value, std::move(left), std::move(right), op.line);
+        }
+        return left;
     }
 
     std::unique_ptr<ASTNode> parseComparison() {
@@ -254,6 +276,11 @@ public:
         Token t = current();
         if (match(TokenType::IntegerLit)) return std::make_unique<LiteralNode>("int", t.value, t.line);
         if (match(TokenType::CharLit)) return std::make_unique<LiteralNode>("char", t.value, t.line);
+        
+        if (match(TokenType::Bang)) {
+            auto expr = parseFactor();
+            return std::make_unique<UnaryOpNode>("!", std::move(expr), t.line);
+        }
         
         if (match(TokenType::Identifier)) {
             if (match(TokenType::LParen)) {

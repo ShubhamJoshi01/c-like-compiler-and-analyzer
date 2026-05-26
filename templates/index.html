@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Static Code Analyzer</title>
     <!-- Modern Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <!-- CodeMirror for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
     <div class="app-container">
         <header>
+            <div class="system-status-container">
+                <span class="status-indicator"><span class="dot live"></span>Compiler Core: C++17</span>
+                <span class="status-indicator"><span class="dot ai"></span>AI Co-Pilot: Active</span>
+            </div>
             <h1>Smart Code Analyzer</h1>
-            <p>Write your C-like code below and let our AI-powered engine analyze it.</p>
+            <p>Premium C-like static analyzer with deep logical reasoning, tree nodes, and instant AI debugging.</p>
         </header>
 
         <!-- Glass Metrics Bar -->
@@ -41,12 +49,35 @@
 
         <main>
             <section class="editor-section">
+                <div class="editor-header"
+                    style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.8rem 1.2rem; border-radius: 12px; margin-bottom: 0.5rem; gap: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);">
+                    <span
+                        style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📋</span> Code Template:
+                    </span>
+                    <select id="template-select" class="glass-select"
+                        style="background: rgba(15, 23, 42, 0.6); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.4rem 1rem; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; cursor: pointer; outline: none; transition: border 0.3s ease;">
+                        <option value="basic" selected>Basic Demo (Unused Var)</option>
+                        <option value="logical">Logical Precedence & NOT (checkLogic)</option>
+                        <option value="recursive">Recursive Factorial (Recursion)</option>
+                        <option value="mismatch">Static Type Mismatch Error</option>
+                    </select>
+                </div>
                 <!-- Our textarea to be replaced by CodeMirror -->
-                <textarea id="code-editor">int main() {
-    int x = 10;
-    int y = x + 5;
-    return y;
-    int z = 0; // Unused
+                <textarea id="code-editor">int add(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    int x = 5;
+    int y = 10;
+    int result = add(x, y);
+    print(result);
+    
+    // Simple unused variable to show semantic linter warning
+    int unusedVar = 99; 
+    
+    return 0;
 }
 </textarea>
                 <button id="analyze-btn">Analyze Code <span>✨</span></button>
@@ -58,6 +89,9 @@
                     <button class="g-tab active" data-tab="tab-semantic">AI Analysis</button>
                     <button class="g-tab" data-tab="tab-console">Terminal</button>
                     <button class="g-tab" data-tab="tab-tokens">Tokens</button>
+                    <button class="g-tab" data-tab="tab-ast">Visual AST</button>
+                    <button class="g-tab" data-tab="tab-flow">Pipeline Flow ⚙️</button>
+                    <button class="g-tab" data-tab="tab-showcase">Capabilities ✨</button>
                 </div>
 
                 <div class="tab-content">
@@ -88,7 +122,8 @@
                                 <span>>_ Console Output</span>
                             </div>
                             <div class="terminal-body" id="terminal-output">
-                                <div class="placeholder-text" style="color: rgba(255,255,255,0.4)">Run valid code to view output...</div>
+                                <div class="placeholder-text" style="color: rgba(255,255,255,0.4)">Run valid code to
+                                    view output...</div>
                             </div>
                         </div>
                     </div>
@@ -105,9 +140,121 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tokens-table-body">
-                                    <tr><td colspan="3" class="placeholder-text">No tokens parsed.</td></tr>
+                                    <tr>
+                                        <td colspan="3" class="placeholder-text">No tokens parsed.</td>
+                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- VISUAL AST TAB -->
+                    <div id="tab-ast" class="g-pane">
+                        <div class="glass-panel ast-panel" id="ast-panel" style="max-height: 500px; overflow-y: auto;">
+                            <h2 style="margin-bottom: 0.5rem;">Visual AST Tree</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Collapse
+                                or expand AST nodes to explore your program's compiled structure.</p>
+                            <div class="ast-tree-container" id="ast-tree-container">
+                                <div class="placeholder-text">Run valid code to view the visual syntax tree...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PIPELINE FLOW TAB -->
+                    <div id="tab-flow" class="g-pane">
+                        <div class="glass-panel flow-panel" style="max-height: 500px; overflow-y: auto;">
+                            <h2 style="margin-bottom: 0.5rem;">Compiler Pipeline Flow ⚙️</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                                Step-by-step execution path of the compilation and analysis lifecycle:</p>
+
+                            <div class="pipeline-flow" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- Step 1 -->
+                                <div class="flow-step" id="flow-lexer">
+                                    <div class="step-num bg-purple">1</div>
+                                    <div class="step-content">
+                                        <h3>Lexical Analysis (Scanner)</h3>
+                                        <p class="step-desc">Groups characters into tokens (Int, Print, Identifier...)
+                                            while filtering comments/whitespace.</p>
+                                        <div class="flow-badge status-pending" id="status-lexer">Pending Analysis...
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flow-connector"></div>
+
+                                <!-- Step 2 -->
+                                <div class="flow-step" id="flow-parser">
+                                    <div class="step-num bg-blue">2</div>
+                                    <div class="step-content">
+                                        <h3>Syntax Analysis (Parser)</h3>
+                                        <p class="step-desc">Generates the Abstract Syntax Tree (AST) using
+                                            recursive-descent parsing and operator precedence.</p>
+                                        <div class="flow-badge status-pending" id="status-parser">Pending Analysis...
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flow-connector"></div>
+
+                                <!-- Step 3 -->
+                                <div class="flow-step" id="flow-semantic">
+                                    <div class="step-num bg-amber">3</div>
+                                    <div class="step-content">
+                                        <h3>Semantic Analysis</h3>
+                                        <p class="step-desc">Performs scope verification, unused declaration warnings,
+                                            and strict C-like type checking.</p>
+                                        <div class="flow-badge status-pending" id="status-semantic">Pending Analysis...
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flow-connector"></div>
+
+                                <!-- Step 4 -->
+                                <div class="flow-step" id="flow-interpreter">
+                                    <div class="step-num bg-green">4</div>
+                                    <div class="step-content">
+                                        <h3>Tree-Walking Interpretation</h3>
+                                        <p class="step-desc"> Walks and executes AST nodes on a virtual stack machine to
+                                            output results to the console.</p>
+                                        <div class="flow-badge status-pending" id="status-interpreter">Pending
+                                            Analysis...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAPABILITIES TAB -->
+                    <div id="tab-showcase" class="g-pane">
+                        <div class="glass-panel showcase-panel" style="max-height: 500px; overflow-y: auto;">
+                            <h2 style="margin-bottom: 0.5rem;">Core Upgrades & Capabilities ✨</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Below
+                                are the custom compiler features and diagnostic enhancements implemented in this
+                                compilation sandbox:</p>
+                            <div class="showcase-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div class="showcase-card">
+                                    <div class="showcase-icon glow-purple">⚡</div>
+                                    <div class="showcase-content">
+                                        <h3>Boolean Logic Engine</h3>
+                                        <p>Parses and checks logical <code>&&</code>, <code>||</code>, and
+                                            <code>!</code> operations with C-style short-circuiting.</p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card">
+                                    <div class="showcase-icon glow-green">🌳</div>
+                                    <div class="showcase-content">
+                                        <h3>Visual AST Tree</h3>
+                                        <p>Interactive collapsible tree structure showing syntax compilation branches.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card">
+                                    <div class="showcase-icon glow-blue">🚨</div>
+                                    <div class="showcase-content">
+                                        <h3>Gutter Diagnostics</h3>
+                                        <p>Inline line markers in the text editor displaying compiler errors and
+                                            warnings in real-time.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,4 +268,5 @@
     <!-- Custom JS -->
     <script src="/static/js/main.js"></script>
 </body>
+
 </html>

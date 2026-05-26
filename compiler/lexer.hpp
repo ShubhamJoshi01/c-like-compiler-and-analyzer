@@ -9,6 +9,7 @@ enum class TokenType {
     Int, Char, If, Else, While, For, Return, Print,
     Identifier, IntegerLit, CharLit,
     Plus, Minus, Star, Slash, Assign, Eq, Neq, Lt, Gt, Lte, Gte,
+    AmpAmp, PipePipe, Bang,
     LParen, RParen, LBrace, RBrace, Semi, Comma,
     Eof, Invalid
 };
@@ -137,7 +138,13 @@ public:
                 return Token{TokenType::Assign, "=", start_line};
             case '!':
                 if (peek() == '=') { advance(); return Token{TokenType::Neq, "!=", start_line}; }
-                return Token{TokenType::Invalid, "!", start_line};
+                return Token{TokenType::Bang, "!", start_line};
+            case '&':
+                if (peek() == '&') { advance(); return Token{TokenType::AmpAmp, "&&", start_line}; }
+                return Token{TokenType::Invalid, "&", start_line};
+            case '|':
+                if (peek() == '|') { advance(); return Token{TokenType::PipePipe, "||", start_line}; }
+                return Token{TokenType::Invalid, "|", start_line};
             case '<':
                 if (peek() == '=') { advance(); return Token{TokenType::Lte, "<=", start_line}; }
                 return Token{TokenType::Lt, "<", start_line};
