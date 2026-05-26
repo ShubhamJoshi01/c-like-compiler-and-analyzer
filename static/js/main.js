@@ -46,7 +46,6 @@ int main() {
     return 0;
 }`,
         logical: `int checkLogic(int a, int b) {
-    // Tests relational comparisons and logical negation (!)
     if (a > 0 && !b) {
         return 1;
     }
@@ -56,8 +55,6 @@ int main() {
 int main() {
     int x = 10;
     int y = 0;
-    
-    // Unused variable to trigger a static quality warning card!
     int unusedVar = 99; 
 
     // Tests logical AND (&&) combining relations and function calls
@@ -95,10 +92,8 @@ int main() {
         mismatch: `int main() {
     int x = 10;
     char c = 'a';
-    
-    // Semantic Error: Type mismatch in assignment
+
     x = c; 
-    
     // Semantic Error: Variable used before assignment
     int uninit;
     int y = uninit + 5;
@@ -140,7 +135,7 @@ int main() {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
             tabPanes.forEach(p => p.classList.remove('active'));
-            
+
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
         });
@@ -173,14 +168,14 @@ int main() {
     // Helper to recursively build collapsible AST tree
     function createAstNodeHtml(node) {
         if (!node) return null;
-        
+
         const li = document.createElement('li');
         const nodeDiv = document.createElement('div');
         nodeDiv.className = 'ast-node';
-        
+
         let hasChildren = false;
         const children = [];
-        
+
         // Extract children based on node type
         if (node.type === 'Program' || node.type === 'Block') {
             if (node.statements && node.statements.length > 0) {
@@ -237,7 +232,7 @@ int main() {
                 node.args.forEach(a => children.push(a));
             }
         }
-        
+
         // Add collapse toggle
         if (hasChildren) {
             const toggle = document.createElement('span');
@@ -254,7 +249,7 @@ int main() {
             spacer.style.width = '14px';
             nodeDiv.appendChild(spacer);
         }
-        
+
         // Render Meta Prefix if exists (e.g. "[Condition]", "[Then]")
         if (node._meta) {
             const meta = document.createElement('span');
@@ -262,23 +257,23 @@ int main() {
             meta.textContent = `[${node._meta}]`;
             nodeDiv.appendChild(meta);
         }
-        
+
         // Badge Type
         const typeBadge = document.createElement('span');
         typeBadge.className = 'ast-node-type';
         typeBadge.textContent = node.type;
         nodeDiv.appendChild(typeBadge);
-        
+
         // Display values based on node type
         if (node.type === 'Literal') {
             const valSpan = document.createElement('span');
             valSpan.className = 'ast-node-val';
             valSpan.textContent = node.val_type === 'char' ? `'${node.value}'` : node.value;
-            
+
             const metaSpan = document.createElement('span');
             metaSpan.className = 'ast-node-meta';
             metaSpan.textContent = `(${node.val_type})`;
-            
+
             nodeDiv.appendChild(valSpan);
             nodeDiv.appendChild(metaSpan);
         } else if (node.type === 'Identifier') {
@@ -295,11 +290,11 @@ int main() {
             const nameSpan = document.createElement('span');
             nameSpan.className = 'ast-node-name';
             nameSpan.textContent = node.name;
-            
+
             const metaSpan = document.createElement('span');
             metaSpan.className = 'ast-node-meta';
             metaSpan.textContent = `(${node.val_type})`;
-            
+
             nodeDiv.appendChild(nameSpan);
             nodeDiv.appendChild(metaSpan);
         } else if (node.type === 'Assign') {
@@ -311,11 +306,11 @@ int main() {
             const nameSpan = document.createElement('span');
             nameSpan.className = 'ast-node-name';
             nameSpan.textContent = `${node.name}()`;
-            
+
             const metaSpan = document.createElement('span');
             metaSpan.className = 'ast-node-meta';
             metaSpan.textContent = `returns ${node.return_type}`;
-            
+
             nodeDiv.appendChild(nameSpan);
             nodeDiv.appendChild(metaSpan);
         } else if (node.type === 'FunctionCall') {
@@ -324,7 +319,7 @@ int main() {
             nameSpan.textContent = `${node.name}()`;
             nodeDiv.appendChild(nameSpan);
         }
-        
+
         // Line number
         if (node.line) {
             const lineSpan = document.createElement('span');
@@ -333,9 +328,9 @@ int main() {
             lineSpan.textContent = `L${node.line}`;
             nodeDiv.appendChild(lineSpan);
         }
-        
+
         li.appendChild(nodeDiv);
-        
+
         // Append child nodes
         if (hasChildren) {
             const childrenUl = document.createElement('ul');
@@ -345,7 +340,7 @@ int main() {
             });
             li.appendChild(childrenUl);
         }
-        
+
         return li;
     }
 
@@ -358,7 +353,7 @@ int main() {
         const errorsCount = (data.errors || []).length;
         const warningsCount = (data.warnings || []).length;
         const issuesCount = errorsCount + warningsCount;
-        
+
         metricIssues.textContent = issuesCount;
         metricFuncs.textContent = data.total_funcs !== undefined ? data.total_funcs : '-';
         metricVars.textContent = data.total_vars !== undefined ? data.total_vars : '-';
@@ -383,7 +378,7 @@ int main() {
         if (data.ai_summary) {
             summaryPanel.style.display = 'block';
             aiSummaryText.textContent = data.ai_summary;
-            
+
             // Score handling inside Summary Panel
             const score = data.score || 0;
             setTimeout(() => { scoreBar.style.width = `${score}%`; }, 100);
@@ -414,12 +409,12 @@ int main() {
                 const card = document.createElement('div');
                 card.className = 'glass-panel issue-card';
                 card.style.borderLeft = `4px solid var(--${issue.severity}-color)`;
-                
+
                 // Highlight lines in CodeMirror (lines are 1-indexed in report, 0-indexed in CM)
                 if (issue.line > 0) {
                     const lineHandle = codeEditor.addLineClass(
-                        issue.line - 1, 
-                        'background', 
+                        issue.line - 1,
+                        'background',
                         issue.severity === 'error' ? 'cm-error-line' : 'cm-warning-line'
                     );
                     highlightedLineHandles.push(lineHandle);
@@ -431,7 +426,7 @@ int main() {
                     const uId = `ai-box-${idx}`;
                     const expText = issue.ai_explanation || '';
                     const codeSnip = issue.corrected_snippet ? `<pre><code>${escapeHtml(issue.corrected_snippet)}</code></pre>` : '';
-                    
+
                     aiHTML = `
                         <div class="ai-controls">
                             <button class="ai-btn explain-btn" onclick="toggleBox('${uId}', 'explanation')">Explain with AI 🤖</button>
@@ -553,7 +548,7 @@ int main() {
                 interpreterBadge.innerHTML = 'Pending Analysis...';
             }
         }
-        
+
         // Auto-switch tabs based on context
         if (errorsCount > 0) {
             document.querySelector('[data-tab="tab-semantic"]').click();
@@ -566,7 +561,7 @@ int main() {
 });
 
 // Global toggler
-window.toggleBox = function(boxId, type) {
+window.toggleBox = function (boxId, type) {
     const box = document.getElementById(boxId);
     if (box.style.display === 'block' && box.dataset.currentType === type) {
         box.style.display = 'none';
@@ -591,9 +586,9 @@ window.toggleBox = function(boxId, type) {
 
 function escapeHtml(unsafe) {
     return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
